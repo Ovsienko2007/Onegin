@@ -18,8 +18,6 @@ int sort(char ***str, int num_element, int (*func)(const char *, const char*)){
 }
 
 int read_file(FILE * stream, int *text_len, char *** text){
-    if (stream == NULL) return -1;
-
     int text_position = 0;
     
     for (;text_position < *text_len; text_position++){

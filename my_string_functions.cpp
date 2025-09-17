@@ -79,7 +79,7 @@ char * my_fgets(char *str, int num_chars, FILE *stream){
 }
 
 int my_atoi(const char * str){
-    if (str== NULL) return NULL;
+    if (str== NULL) return -1;
 
     bool less_than_zero = false;
     if (str[0] == '-'){
@@ -90,7 +90,7 @@ int my_atoi(const char * str){
     size_t str_position = (size_t)less_than_zero;
     for (; str[str_position] != '\0'; str_position++){
         if (!('0' <= str[str_position] && str[str_position] <= '9')){
-            return NULL;
+            return -1;
         }
         ans = ans * 10 + (str[str_position] - '0');
     }

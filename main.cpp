@@ -10,7 +10,13 @@ int main(){
 
     text_size = read_file(file, &text_size, &text);
 
+    if (file == NULL){
+    	printf("File not found\n");
+	return 0;
+    }
+
     fclose(file);
+
 
     for (int i = 0; i < text_size; i++){
         printf("%s\n", text[i]);
@@ -25,6 +31,5 @@ int main(){
     printf("_____________________________\n");
 
 
-    free(text);
     return 0;
 }
