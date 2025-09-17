@@ -165,7 +165,7 @@ char * my_strcpy(char * new_str, const char * old_str){
     return new_str;
 }
 
-char * my_strchr(char * str, int symbol){
+char * my_strchr(const char * str, int symbol){
     if (str == NULL) return NULL;
 
     for (int symbol_num = 0; str[symbol_num] != '\0'; symbol_num++){

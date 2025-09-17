@@ -1,35 +1,27 @@
 #include <stdio.h>
 #include "my_string_functions.h"
 #include "onegin.h"
+#include "file_read.h"
 
 int main(){
-    int text_size = 14;
-    char ** text = (char **)calloc(text_size, sizeof(char *));
+    const char * file_name = "text.txt";
+    int text_len  = 0;
 
-    FILE * file = fopen("text.txt", "r");
+    char * text = read_file(file_name, &text_len);
 
-    text_size = read_file(file, &text_size, &text);
-
-    if (file == NULL){
-    	printf("File not found\n");
-	return 0;
+    int new_text_len = find_len_text_lines(text);
+    char ** new_text = split_text(text, new_text_len);
+    
+    for (int i = 0; i < new_text_len; i++){
+        printf("%4d: \"%s\"\n", i, new_text[i]);
     }
+    printf("________________\n");
 
-    fclose(file);
+    sort(new_text, new_text_len, my_strcmp);
 
-
-    for (int i = 0; i < text_size; i++){
-        printf("%s\n", text[i]);
+    for (int i = 0; i < new_text_len; i++){
+        printf("%4d: \"%s\"\n", i, new_text[i]);
     }
-    printf("_____________________________\n");
-
-    sort(&text, text_size, my_strcmp);
-
-    for (int text_i = 0; text_i < text_size; text_i++){
-        printf("%s\n", text[text_i]);
-    }
-    printf("_____________________________\n");
-
 
     return 0;
 }

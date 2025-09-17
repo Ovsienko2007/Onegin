@@ -121,8 +121,7 @@ size_t my_strlen(const char * str);
  * 
  * @return character pointer
  */
-char * my_strchr(char * str, int symbol);
-
+char * my_strchr(const char * str, int symbol);
 
 /**
  * @brief print string
