@@ -9,7 +9,7 @@ CFLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef \
    -Wstack-usage=8192 -Wstrict-aliasing -Wstrict-null-sentinel -Wtype-limits\
    -Wwrite-strings -Werror=vla -D_DEBUG -D_EJUDGE_CLIENT_SIDE -DCOLOR_PRINT
    
-OBJECTS = main.o my_string_functions.o onegin.o file_read.o
+OBJECTS = main.o my_string_functions.o onegin.o file_read.o console.o
 EXECUTABLE_NAME = main.exe
 DIR_BUILD = Build
 
@@ -29,11 +29,6 @@ make_folder:
 
 start:
 	./$(DIR_BUILD)/$(EXECUTABLE_NAME)
-
-start_out_to_file:
-	./$(DIR_BUILD)/$(EXECUTABLE_NAME) > out.txt
-	@echo "Command complited"
-
 
 clean:
 	rm -rf ./$(DIR_BUILD)/

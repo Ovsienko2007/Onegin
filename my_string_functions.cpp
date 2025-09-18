@@ -8,7 +8,7 @@ int my_strcmp(const char *str1, const char *str2){
         }
         n++;
     }
-    return 0;
+    return str1[n] - str2[n];
 }
 
 ssize_t my_getline(char **str, size_t *str_len, FILE *stream){
