@@ -15,8 +15,7 @@ DIR_BUILD = Build
 
 all: $(EXECUTABLE_NAME)
 
-
-.PHONY = all clean start
+.PHONY = all clean start start_out_to_file
 
 $(EXECUTABLE_NAME): make_folder  $(OBJECTS)
 	$(CC) $(addprefix ./$(DIR_BUILD)/, $(OBJECTS)) -o ./$(DIR_BUILD)/$(EXECUTABLE_NAME)
@@ -31,5 +30,11 @@ make_folder:
 start:
 	./$(DIR_BUILD)/$(EXECUTABLE_NAME)
 
+start_out_to_file:
+	./$(DIR_BUILD)/$(EXECUTABLE_NAME) > out.txt
+	@echo "Command complited"
+
+
 clean:
 	rm -rf ./$(DIR_BUILD)/
+	rm -f out.txt

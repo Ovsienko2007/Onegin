@@ -3,25 +3,25 @@
 #include "onegin.h"
 #include "file_read.h"
 
+
+
 int main(){
     const char * file_name = "text.txt";
     int text_len  = 0;
 
-    char * text = read_file(file_name, &text_len);
+    char * getted_text = read_file(file_name, &text_len);
 
-    int new_text_len = find_len_text_lines(text);
-    char ** new_text = split_text(text, new_text_len);
-    
-    for (int i = 0; i < new_text_len; i++){
-        printf("%4d: \"%s\"\n", i, new_text[i]);
-    }
-    printf("________________\n");
+    int text_line_len = find_len_text_lines(getted_text);
+    char ** text = split_text(getted_text, text_line_len);
 
-    sort(new_text, new_text_len, my_strcmp);
+    sort_text(text, text_line_len, my_strcmp);
+    print_text(text, text_line_len);
 
-    for (int i = 0; i < new_text_len; i++){
-        printf("%4d: \"%s\"\n", i, new_text[i]);
-    }
+    sort_text(text, text_line_len, my_strcmp_without_case);
+    print_text(text, text_line_len);
+
+    sort_text(text, text_line_len, my_strrcmp_without_case);
+    print_text(text, text_line_len);
 
     return 0;
 }
