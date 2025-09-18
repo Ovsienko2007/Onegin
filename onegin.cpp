@@ -1,5 +1,17 @@
 #include "onegin.h"
+
+/**
+ * @brief counts the number of same elements from two strings from 
+ * the end skips initial and final non-alphabetic characters
+ * 
+ * @param [in]    str1       the first string
+ * @param [in]    str2       the second string
+ * 
+ * @return  0 if strings are equal or number less than 0 if str1 < str2 
+ *          number greater than 0 if str1 > str2 
+ */
 static int is_str_same(const char *str1, const char *str2);
+
 /**
  * @brief find the position of the first alphabetic character in a string
  * 
@@ -98,7 +110,10 @@ void print_text(char **text, int text_line_len){
 }
 
 int generate_random_text(char **text, int text_len, int gen_len){
+    bool need_last_line = (gen_len % 2 == 1);
+
     gen_len /= 2;
+
     for (int line = 0; line < gen_len; line++){
         int spread = 10;
         
@@ -119,6 +134,13 @@ int generate_random_text(char **text, int text_len, int gen_len){
         }
         printf("%s\n%s\n\n", text[position], text[position + placement]);
     }
+
+    if (need_last_line){
+        int position = rand();
+        position = position % (text_len);
+        printf("%s\n", text[position]);
+    }
+
     return 0;
 }
 

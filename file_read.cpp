@@ -41,7 +41,11 @@ char * read_file(const char * file_name, int * text_len){
     if (file_text == NULL)  return NULL;
 
     int file_descriptor = open(file_name, O_RDONLY);
-    if (file_descriptor == -1) return NULL;
+    
+    if (file_descriptor == -1){
+        close(file_descriptor);
+        return NULL;
+    }
 
     *text_len = read(file_descriptor, file_text, find_file_size(file_name));
 

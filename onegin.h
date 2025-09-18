@@ -52,5 +52,14 @@ int my_strrcmp_without_case(const char *str1, const char *str2);
  */
 void print_text(char **text, int text_line_len);
 
+/**
+ * @brief generate text by lines from another text 
+ * 
+ * @param [in]    text            input text
+ * @param [in]    text_line_len   lines in inout text
+ * @param [in]    text_line_len   lines in generated text
+ * 
+ * @return  0
+ */
 int generate_random_text(char **text, int text_len, int gen_len);
 #endif

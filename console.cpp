@@ -1,16 +1,52 @@
 #include "console.h"
 
 /**
- * @brief distributes commands from console
+ * @brief complit commands from console
  * 
- * @param [in] command command that needs to be complited
+ * @param [in] command command
  * 
- * @return execution status
- */
+ * @return command execution status
+*/
 static int run_commands(char *command);
+
+/**
+ * @brief clean buffer of stream
+ * 
+ * @param [in] stream stream
+ * 
+ * @return has the input in the stream ended
+*/
 static int clean_buffer(FILE *stream);
-static int sort_file(char **text, int text_line_len, compare_str_func func);
+
+/**
+ * @brief sort text lines by the funct and print result
+ * 
+ * @param [out]   text       the text
+ * @param [in]    num_lines  the number of lines in text
+ * @param [in]    func       the function by which sorting occurs
+ * 
+ * @return  function execution status
+ */
+static int sort_print_file(char **text, int text_line_len, compare_str_func func);
+
+/**
+ * @brief read text from file and split it into lines 
+ * 
+ * @param [out]    text           lines from file
+ * @param [out]    text_line_len  number of lines in text
+ * 
+ * @return  function execution status
+ */
 static int open_file(char *** text, int *text_line_len);
+
+/**
+ * @brief generate and print text by lines from another text, sort input text
+ * 
+ * @param [out]   text_for_generate       the text from which the lines are taken (sort this text)
+ * @param [in]    text_for_generate_len   number of lines in text
+ * 
+ * @return  function execution status
+ */
 static int generate_text(char ***text_for_generate, int *text_for_generate_len);
 
 int run_console(){
@@ -20,7 +56,13 @@ int run_console(){
 
         int c = 0;
         c = getchar();
-        if (c != '-')  continue;
+        if (c != '-'){
+            if (c != '\n'){
+                clean_buffer(stdin);
+                printf(CONSOLE_RED "There is no such command!\n" CONSOLE_RESET);
+            } 
+            continue;
+        }  
 
         scanf("%10s", command);
         int command_status = run_commands(command);
@@ -62,15 +104,15 @@ static int run_commands(char *command){
     }
 
     if (my_strcmp(command, "s1") == 0){
-        return sort_file(text, text_line_len, my_strcmp);
+        return sort_print_file(text, text_line_len, my_strcmp);
     }
 
     if (my_strcmp(command, "s2") == 0){
-        return sort_file(text, text_line_len, my_strcmp_without_case);
+        return sort_print_file(text, text_line_len, my_strcmp_without_case);
     }
 
     if (my_strcmp(command, "s3") == 0){
-        return sort_file(text, text_line_len, my_strrcmp_without_case);
+        return sort_print_file(text, text_line_len, my_strrcmp_without_case);
     }
 
     if (my_strcmp(command, "g") == 0){
@@ -100,7 +142,7 @@ static int open_file(char *** text, int *text_line_len){
     return 0;
 }
 
-static int sort_file(char **text, int text_line_len, compare_str_func func){
+static int sort_print_file(char **text, int text_line_len, compare_str_func func){
     if (text == NULL){
             return -1;
         }

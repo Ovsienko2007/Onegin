@@ -14,12 +14,12 @@
 #define CONSOLE_RESET      "\033[39m"
 
 /**
- * @brief limits the length of a variable
+ * @brief limits the length of a file name
  */
 const int max_len = 101;
 
 /**
- * @brief  creat console
+ * @brief  start console
  * 
  * @return 0
  */
