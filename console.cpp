@@ -49,6 +49,26 @@ static int open_file(char *** text, int *text_line_len);
  */
 static int generate_text(char ***text_for_generate, int *text_for_generate_len);
 
+/**
+ * @brief reads lines from a file in initial order
+ * 
+ * @param [out]   text_points       points on lines
+ * @param [in]    line_count        number of lines in text
+ * 
+ * @return  function execution status
+ */
+static int print_file_text(char ** text_points, int line_count);
+
+/**
+ * @brief finds the minimum pointer to a string in text
+ * 
+ * @param [in]    text_points       points on strings
+ * @param [in]    line_count        number of strings in text
+ * 
+ * @return  the minimum pointer to a string in text
+ */
+static char * min_point(char **text_points, int line_count);
+
 int run_console(){
     while (1){
         char command[max_len] = {};
@@ -97,8 +117,6 @@ static int run_commands(char *command){
     static char **text_for_generate = NULL;
     static int    text_for_generate_len = 0;
 
-    if (my_strcmp(command, "q") == 0) return 1;
-
     if (my_strcmp(command, "of") == 0){
         return open_file(&text, &text_line_len);
     }
@@ -119,6 +137,11 @@ static int run_commands(char *command){
         return generate_text(&text_for_generate, &text_for_generate_len);
     }
 
+    if (my_strcmp(command, "p") == 0){
+        return print_file_text(text, text_line_len);
+    }
+
+    if (my_strcmp(command, "q") == 0) return 1;
     return -2;
 }
 
@@ -174,4 +197,27 @@ static int generate_text(char ***text_for_generate, int *text_for_generate_len){
 
     generate_random_text(*text_for_generate, *text_for_generate_len, generate_text_len);
     return 0;
+}
+
+static int print_file_text(char ** text_points, int line_count){
+    if (text_points == NULL) return -1; 
+    char * text = min_point(text_points, line_count);
+    printf("%4d: \"%s\"\n", 0, text);
+    for (int text_position = 1; text_position < line_count; text++){
+        if (text[0] == '\0'){
+            printf("%4d: \"%s\"\n", text_position, text + 1);
+            text_position++;
+        }
+    }
+    printf("_____________________________\n");
+
+    return 0;
+}
+
+static char * min_point(char **text_points, int line_count){
+    char *ans = text_points[0];
+    for (int text_position = 0; text_position < line_count; text_position++){
+        ans = ans < text_points[text_position] ? ans : text_points[text_position];
+    }
+    return ans;
 }

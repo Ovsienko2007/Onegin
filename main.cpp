@@ -4,7 +4,6 @@
 #include "file_read.h"
 #include "console.h"
 
-
 int main(){
     run_console();
     return 0;
