@@ -2,6 +2,7 @@
 #define ONEGIN_H_
 
 #include <ctype.h>
+#include <stdlib.h>
 
 #include "my_string_functions.h"
 
@@ -50,4 +51,6 @@ int my_strrcmp_without_case(const char *str1, const char *str2);
  *          number greater than 0 if str1 > str2 
  */
 void print_text(char **text, int text_line_len);
+
+int generate_random_text(char **text, int text_len, int gen_len);
 #endif
