@@ -50,6 +50,50 @@ static char change_upper_to_lower(const char symbol);
  */
 static int go_to_str_end(const char *str);
 
+/**
+ * @brief swap two lines
+ * 
+ * @param [in] line1 the first line
+ * @param [in] line1 the second line
+ */
+static void swap(char **line1, char **line2){
+    char * buffer = *line1;
+    *line1 = *line2;
+    *line2 = buffer;
+    return;
+}
+
+/**
+ * @brief splits lines from text by func
+ * 
+ * @param [out] text  text
+ * @param [in]  start the number of first line
+ * @param [in]  end   the number of last line
+ * 
+ * @return number of lines going earlier by func
+ */
+static int partition(char **text, int start, int end, compare_str_func func){
+    char *base = text[end - 1];
+    int new_base_pos = start;
+
+    for (int text_line = start; text_line < end; text_line++){
+        if (func(text[text_line], base) < 0){
+            swap(&text[new_base_pos], &text[text_line]);
+            new_base_pos++;
+        }
+    }
+    swap(&text[end - 1], &text[new_base_pos]);
+    return new_base_pos;
+}
+
+void my_qsort(char **text, int start, int end, compare_str_func func){
+    if (end - start <= 1 || start < 0) return;
+
+    int smaller_elems = partition(text, start, end, func);
+    my_qsort(text, start, smaller_elems, func);
+    my_qsort(text, smaller_elems + 1, end, func);
+}
+
 int sort_text(char **text, int num_lines, compare_str_func func){
     bool cycle_status = true;
     while (cycle_status){
@@ -58,9 +102,7 @@ int sort_text(char **text, int num_lines, compare_str_func func){
         for (int text_line = 0; text_line < num_lines - 1; text_line++){
             if (func(text[text_line], text[text_line + 1]) > 0){
                 cycle_status = true;
-                char * buffer = text[text_line];
-                text[text_line] = text[text_line + 1];
-                text[text_line + 1] = buffer;
+                swap(&text[text_line], &text[text_line + 1]);
             }
         }
     }

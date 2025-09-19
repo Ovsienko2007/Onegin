@@ -169,7 +169,7 @@ static int sort_print_file(char **text, int text_line_len, compare_str_func func
     if (text == NULL){
             return -1;
         }
-    sort_text(text, text_line_len, func);
+    my_qsort(text, 0, text_line_len, func);
     print_text(text, text_line_len);
     return 0;
 }

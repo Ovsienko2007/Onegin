@@ -6,10 +6,25 @@
 
 #include "my_string_functions.h"
 
+/**
+ * @brief the function by which sorting occurs
+ */
 typedef int (*compare_str_func)(const char *, const char*);
 
 /**
- * @brief sort text lines by the funct
+ * @brief sort text lines from start to end by the func
+ * 
+ * @param [out]   text       the text
+ * @param [in]    start      the number of first line fron text wich will be sorted
+ * @param [in]    end        the number of last line fron text wich will be sorted
+ * @param [in]    func       the function by which sorting occurs
+ * 
+ * @return  sorted text 
+ */
+void my_qsort(char **text, int start, int end, compare_str_func func);
+
+/**
+ * @brief sort text lines by the func
  * 
  * @param [out]   text       the text
  * @param [in]    num_lines  the number of lines in text
