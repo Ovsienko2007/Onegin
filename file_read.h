@@ -7,6 +7,12 @@
 
 #include "my_string_functions.h"
 
+struct data_text{
+    int size;
+    char * text;
+    char **text_points;
+};
+
 /**
  * @brief reads all lines from file write number of lines in text_len
  * 
@@ -15,7 +21,7 @@
  * 
  * @return string with lines from file, NULL in case of error
  */
-char * read_file(const char * file_name, int * text_len);
+char * read_file(const char * file_name, data_text *data);
 
 /**
  * @brief finds the size of the given file in bytes
@@ -24,7 +30,7 @@ char * read_file(const char * file_name, int * text_len);
  * 
  * @return  size of the given file
  */
-unsigned int find_file_size(const char * file_name);
+off_t find_file_size(const char * file_name);
 
 /**
  * @brief finds the number of lines in the given text
@@ -33,7 +39,7 @@ unsigned int find_file_size(const char * file_name);
  * 
  * @return  the number of lines in the given text, 0 in case of error
  */
-int find_len_text_lines(const char * text);
+int find_len_text_lines(data_text data);
 
 /**
  * @brief replaces the first line_count enters of text with \0
@@ -43,5 +49,5 @@ int find_len_text_lines(const char * text);
  * 
  * @return  array of pointers to the first elements of the rows, NULL in case of error
  */
-char ** split_text(char * text, int line_count);
+int split_text(data_text *data);
 #endif

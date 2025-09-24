@@ -18,7 +18,9 @@
 /**
  * @brief limits the length of a file name
  */
-const int max_len = 101;
+const int max_len = 16;
+
+const int max_file_len = 101;
 
 /**
  * @brief  start console

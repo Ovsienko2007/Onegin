@@ -152,14 +152,14 @@ int my_strcmp_for_sort(const void *param1, const void *param2){
     const char *str1 = *(const char * const *)param1;
     const char *str2 = *(const char * const *)param2;
 
-    size_t n = 0;
-    while (str1[n] != '\0' && str2[n] != '\0'){
-        if (str1[n] != str2[n]){
-            return str1[n] - str2[n];
+    size_t str_position = 0;
+    while (str1[str_position] != '\0' && str2[str_position] != '\0'){
+        if (str1[str_position] != str2[str_position]){
+            return str1[str_position] - str2[str_position];
         }
-        n++;
+        str_position++;
     }
-    return str1[n] - str2[n];
+    return str1[str_position] - str2[str_position];
 }
 
 int my_strcmp_without_case(const void *param1, const void *param2){
@@ -210,7 +210,7 @@ void print_text(char **text, int text_line_len){
     printf("_____________________________\n");
 }
 
-int generate_random_text(char **text, int text_len, int gen_len){
+int generate_random_text(char **text, int text_len, int gen_len){ // generate_rythmed text
     bool need_last_line = (gen_len % 2 == 1);
 
     gen_len /= 2;
@@ -228,6 +228,7 @@ int generate_random_text(char **text, int text_len, int gen_len){
         while (new_placement < spread){
             new_placement++;
 
+            // TODO what is 3?
             if (abs(3 - is_str_same(text[position], text[position + new_placement])) < 
                 abs(3 - is_str_same(text[position], text[position + placement])) && position != new_placement){
                 placement = new_placement;
