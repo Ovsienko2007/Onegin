@@ -33,15 +33,6 @@ static int skip_start_symbols(const char *str);
 static int skip_end_symbols(const char *str, int str_pos, int str_end_pos);
 
 /**
- * @brief change upper letters to lower
- * 
- * @param [in] symbol letters
- * 
- * @return  lower letter
- */
-static char change_upper_to_lower(const char symbol);
-
-/**
  * @brief find the position of the last element of string
  * 
  * @param [in] str string
@@ -51,90 +42,104 @@ static char change_upper_to_lower(const char symbol);
 static int go_to_str_end(const char *str);
 
 /**
- * @brief swap two lines
+ * @brief swap two params from array
  * 
- * @param [in] line1 the first line
- * @param [in] line1 the second line
+ * @param [in] param1 the point on the first line
+ * @param [in] param2 the point on the the second line
  */
-static void swap(void *par1, void *par2, size_t size) {
-    char *char_par1 = (char*)par1;
-    char *char_par2 = (char*)par2;
-    
-    for (size_t par_pos = 0; par_pos < size; par_pos++) {
-        char buffer = char_par1[par_pos];
-        char_par1[par_pos] = char_par2[par_pos];
-        char_par2[par_pos] = buffer;
-    }
-}
+static void swap(void *param1, void *param2, size_t size);
 
+/**
+ * @brief find point on element from void array
+ * 
+ * @param [in]  data       array
+ * @param [in]  size_elem  size of one element from array
+ * @param [in]  position   position of element
+ */
 static void * data_pos(const void* data, size_t size_elem, int position){
     return (void *)((size_t)data + size_elem * position);
 }
 
 /**
- * @brief splits lines from text by func
+ * @brief splits elements from array by func with Lomuto partition scheme
  * 
- * @param [out] text  text
- * @param [in]  start the number of first line
- * @param [in]  end   the number of last line
+ * @param [out] data          array
+ * @param [in]  elem_size     size of elements in array
+ * @param [in]  start         the number of first line
+ * @param [in]  end           the number of last line
+ * @param [in]  compare_func  comparator
  * 
  * @return number of lines going earlier by func
  */
-static int partition_lomuto(const void *text, size_t elem,  int start, int end, compare_str_func func){
-    void *base = data_pos(text, elem, end - 1);
+static int partition_lomuto(const void *data, size_t elem_size,
+                            int start, int end, compareFunc compare_func) __attribute__((unused));
+
+/**
+ * @brief splits elements from array by func with Hoare partition scheme
+ * 
+ * @param [out] data          array
+ * @param [in]  elem_size     size of elements in array
+ * @param [in]  start         the number of first line
+ * @param [in]  end           the number of last line
+ * @param [in]  compare_func  comparator
+ * 
+ * @return number of lines going earlier by func
+ */
+static int partition_hoare(const void *text, size_t elem,
+                           int start, int end, compareFunc compare_func) __attribute__((unused));
+
+static int partition_lomuto(const void *data, size_t elem_size,  int start, int end, compareFunc compare_func) {
+    void *base = data_pos(data, elem_size, end - 1);
     int new_base_pos = start;
 
     for (int text_line = start; text_line < end; text_line++){
-        if (func(data_pos(text, elem, text_line), base) < 0){
-            swap(data_pos(text, elem, new_base_pos), data_pos(text, elem, text_line), elem);
+        if (compare_func(data_pos(data, elem_size, text_line), base) < 0){
+            swap(data_pos(data, elem_size, new_base_pos), data_pos(data, elem_size, text_line), elem_size);
             new_base_pos++;
         }
     }
-    swap(base, data_pos(text, elem, new_base_pos), elem);
+    swap(base, data_pos(data, elem_size, new_base_pos), elem_size);
     return new_base_pos;
 }
 
-static int partition_hoar(const void *text, size_t elem,  int start, int end, compare_str_func func){
+static int partition_hoare(const void *text, size_t elem,  int start, int end, compareFunc compare_func){
     void *base = data_pos(text, elem, end - 1);
-    int start_position = start;
-    int end_position = end - 2;
+    end -= 2;
 
-    while (end_position >= start_position){
-        while (start_position < end && func(data_pos(text, elem, start_position), base) < 0){
-            start_position++;
+    while (end >= start){
+        while (start < end && compare_func(data_pos(text, elem, start), base) < 0){
+            start++;
         }
-        while (end_position >  0 && func(data_pos(text, elem, end_position), base) > 0){
-            end_position--;
+        while (end >  0 && compare_func(data_pos(text, elem, end), base) > 0){
+            end--;
         }
 
-        
-        if (start_position >=  end_position) break;
+        if (start >=  end) break;
 
-        swap(data_pos(text, elem, start_position), data_pos(text, elem, end_position), elem);
+        swap(data_pos(text, elem, start), data_pos(text, elem, end), elem);
 
-        start_position++;
-        end_position--;
+        start++;
+        end--;
     }
-    swap(base, data_pos(text, elem, start_position), elem);
-    return start_position;
+    swap(base, data_pos(text, elem, start), elem);
+    return start;
 }
 
-
-void my_qsort(const void *data, size_t elem, int start, int end, compare_str_func func){
+void my_qsort(const void *data, size_t elem, int start, int end, compareFunc compare_func){
     if (end - start <= 1 || start < 0) return;
 
-    int smaller_elems = partition_hoar(data, elem,  start, end, func);
-    my_qsort(data, elem, start, smaller_elems, func);
-    my_qsort(data, elem, smaller_elems + 1, end, func);
+    int smaller_elems = partition_hoare(data, elem,  start, end, compare_func);
+    my_qsort(data, elem, start, smaller_elems, compare_func);
+    my_qsort(data, elem, smaller_elems + 1, end, compare_func);
 }
 
-int bubble_sort(void *text, size_t elem, int num_lines, compare_str_func func){
+int bubble_sort(void *text, size_t elem, int num_lines, compareFunc compare_func){
     bool cycle_status = true;
     while (cycle_status){
         cycle_status = false;
 
         for (int text_line = 0; text_line < num_lines - 1; text_line++){
-            if (func(data_pos(text, elem, text_line), data_pos(text, elem, text_line + 1)) > 0){
+            if (compare_func(data_pos(text, elem, text_line), data_pos(text, elem, text_line + 1)) > 0){
                 cycle_status = true;
                 swap(data_pos(text, elem, text_line), data_pos(text, elem, text_line + 1), elem);
             }
@@ -165,8 +170,8 @@ int my_strcmp_without_case(const void *param1, const void *param2){
     int str2_pos = skip_start_symbols(str2);
 
     while (str1[str1_pos] != '\0' && str2[str2_pos] != '\0'){
-        if (change_upper_to_lower(str1[str1_pos]) != change_upper_to_lower(str2[str2_pos])){
-            return change_upper_to_lower(str1[str1_pos]) - change_upper_to_lower(str2[str2_pos]);
+        if (tolower(str1[str1_pos]) != tolower(str2[str2_pos])){
+            return tolower(str1[str1_pos]) - tolower(str2[str2_pos]);
         }
         str2_pos++;
         str1_pos++;
@@ -188,14 +193,14 @@ int my_strrcmp_without_case(const void *param1, const void *param2){
     str2_pos = skip_end_symbols(str2, str2_pos, str2_left_pos);
 
     while (str1_left_pos <= str1_pos && str2_left_pos <= str2_pos){
-        if (change_upper_to_lower(str1[str1_pos]) != change_upper_to_lower(str2[str2_pos])){
-            return change_upper_to_lower(str1[str1_pos]) - change_upper_to_lower(str2[str2_pos]);
+        if (tolower(str1[str1_pos]) != tolower(str2[str2_pos])){
+            return tolower(str1[str1_pos]) - tolower(str2[str2_pos]);
         }
         str2_pos--;
         str1_pos--;
     }
 
-    return change_upper_to_lower(str1[str1_pos]) - change_upper_to_lower(str2[str2_pos]);
+    return tolower(str1[str1_pos]) - tolower(str2[str2_pos]);
 }
 
 void print_text(char **text, int text_line_len){
@@ -266,14 +271,6 @@ static int go_to_str_end(const char *str){
     return str_pos;
 }
 
-static char change_upper_to_lower(const char symbol){
-    if (isupper(symbol)){
-        return symbol - 'A' + 'a';
-    }
-
-    return symbol;
-}
-
 static int is_str_same(const char *str1, const char *str2){
     int str1_left_pos = skip_start_symbols(str1);
     int str2_left_pos = skip_start_symbols(str2);
@@ -287,7 +284,7 @@ static int is_str_same(const char *str1, const char *str2){
     int ans = 0;
 
     while (str1_left_pos <= str1_pos && str2_left_pos <= str2_pos){
-        if (change_upper_to_lower(str1[str1_pos]) != change_upper_to_lower(str2[str2_pos])){
+        if (tolower(str1[str1_pos]) != tolower(str2[str2_pos])){
             break;
         }
         ans++;
@@ -295,4 +292,15 @@ static int is_str_same(const char *str1, const char *str2){
         str1_pos--;
     }
     return ans;
+}
+
+static void swap(void *param1, void *param2, size_t size) {
+    char *char_par1 = (char*)param1;
+    char *char_par2 = (char*)param2;
+    
+    for (size_t par_pos = 0; par_pos < size; par_pos++) {
+        char buffer = char_par1[par_pos];
+        char_par1[par_pos] = char_par2[par_pos];
+        char_par2[par_pos] = buffer;
+    }
 }

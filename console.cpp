@@ -27,7 +27,7 @@ static int clean_buffer(FILE *stream);
  * 
  * @return  function execution status
  */
-static int sort_print_file(char **text, int text_line_len, compare_str_func func);
+static int sort_print_file(char **text, int text_line_len, compareFunc func);
 
 /**
  * @brief read text from file and split it into lines 
@@ -166,11 +166,19 @@ static int open_file(char *** text, int *text_line_len){
     return 0;
 }
 
-static int sort_print_file(char **text, int text_line_len, compare_str_func func){
+static int sort_print_file(char **text, int text_line_len, compareFunc func){
     if (text == NULL){
             return -1;
         }
+    clock_t start = clock();
+
     my_qsort(text, sizeof(char *), 0, text_line_len, func);
+
+    clock_t end = clock();
+    double time_spent = (double)(end - start) * 1000 / CLOCKS_PER_SEC;
+
+    printf("Time was spent sorting: " CONSOLE_YELLOW  "%0.3f s\n" CONSOLE_RESET, time_spent);
+    
     print_text(text, text_line_len);
     return 0;
 }
