@@ -2,6 +2,7 @@
 #define CONSOL_H_
 
 #include <stdio.h>
+#include <time.h>
 
 #include "my_string_functions.h"
 #include "onegin.h"
@@ -9,6 +10,7 @@
 
 #define CONSOLE_RED        "\033[31m"
 #define CONSOLE_GREEN      "\033[32m"
+#define CONSOLE_YELLOW     "\033[33m"
 #define CONSOLE_BLUE       "\033[34m"
 #define CONSOLE_PIRPLE     "\033[35m"
 #define CONSOLE_RESET      "\033[39m"

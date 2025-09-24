@@ -47,7 +47,7 @@ static int open_file(char *** text, int *text_line_len);
  * 
  * @return  function execution status
  */
-static int generate_text(char ***text_for_generate, int *text_for_generate_len);
+static int generate_text(const char * file_name);
 
 /**
  * @brief reads lines from a file in initial order
@@ -114,15 +114,12 @@ static int run_commands(char *command){
     static char **text = NULL;
     static int   text_line_len = 0;
 
-    static char **text_for_generate = NULL;
-    static int    text_for_generate_len = 0;
-
     if (my_strcmp(command, "of") == 0){
         return open_file(&text, &text_line_len);
     }
 
     if (my_strcmp(command, "s1") == 0){
-        return sort_print_file(text, text_line_len, my_strcmp);
+        return sort_print_file(text, text_line_len, my_strcmp_for_sort);
     }
 
     if (my_strcmp(command, "s2") == 0){
@@ -133,8 +130,12 @@ static int run_commands(char *command){
         return sort_print_file(text, text_line_len, my_strrcmp_without_case);
     }
 
-    if (my_strcmp(command, "g") == 0){
-        return generate_text(&text_for_generate, &text_for_generate_len);
+    if (my_strcmp(command, "g1") == 0){
+        return generate_text("ONEGIN.txt");
+    }
+
+    if (my_strcmp(command, "g2") == 0){
+        return generate_text("Swearing.txt");
     }
 
     if (my_strcmp(command, "p") == 0){
@@ -169,33 +170,39 @@ static int sort_print_file(char **text, int text_line_len, compare_str_func func
     if (text == NULL){
             return -1;
         }
-    my_qsort(text, 0, text_line_len, func);
+    my_qsort(text, sizeof(char *), 0, text_line_len, func);
     print_text(text, text_line_len);
     return 0;
 }
 
-static int generate_text(char ***text_for_generate, int *text_for_generate_len){
-    if (*text_for_generate == NULL){
-        int text_len  = 0;
-        const char *file_name = "ONEGIN.txt";
+static int generate_text(const char * file_name){
+    int text_len  = 0;
 
-        char *getted_text = read_file(file_name, &text_len);
-        if (getted_text == NULL) return -1;
+    char *getted_text = read_file(file_name, &text_len);
+    if (getted_text == NULL) return -1;
 
-        *text_for_generate_len = find_len_text_lines(getted_text);
-        if (*text_for_generate_len == 0) return -1;
 
-        *text_for_generate = split_text(getted_text, *text_for_generate_len);
-        if (*text_for_generate == NULL) return -1;
+    int text_for_generate_len = find_len_text_lines(getted_text);
+    if (text_for_generate_len == 0) return -1;
 
-        sort_text(*text_for_generate, *text_for_generate_len, my_strrcmp_without_case);
-    }
+    char ** text_for_generate = split_text(getted_text, text_for_generate_len);
+    if (text_for_generate == NULL) return -1;
+
+    clock_t start = clock();
+
+    my_qsort(text_for_generate, sizeof(char *), 0, text_for_generate_len, my_strrcmp_without_case);
+
+    clock_t end = clock();
+    double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
+
+    printf("Time was spent sorting: " CONSOLE_YELLOW  "%0.3f s\n" CONSOLE_RESET, time_spent);
+
     int generate_text_len = 0;
 
     printf(CONSOLE_BLUE "How many lines you want generate: " CONSOLE_RESET);
     scanf("%d", &generate_text_len);
 
-    generate_random_text(*text_for_generate, *text_for_generate_len, generate_text_len);
+    generate_random_text(text_for_generate, text_for_generate_len, generate_text_len);
     return 0;
 }
 

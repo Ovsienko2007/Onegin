@@ -14,7 +14,6 @@ char ** split_text(char * text, int line_count){
         *text = '\0';
         text++;
     }
-
     return text_points;
 }
 

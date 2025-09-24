@@ -56,11 +56,19 @@ static int go_to_str_end(const char *str);
  * @param [in] line1 the first line
  * @param [in] line1 the second line
  */
-static void swap(char **line1, char **line2){
-    char * buffer = *line1;
-    *line1 = *line2;
-    *line2 = buffer;
-    return;
+static void swap(void *par1, void *par2, size_t size) {
+    char *char_par1 = (char*)par1;
+    char *char_par2 = (char*)par2;
+    
+    for (size_t par_pos = 0; par_pos < size; par_pos++) {
+        char buffer = char_par1[par_pos];
+        char_par1[par_pos] = char_par2[par_pos];
+        char_par2[par_pos] = buffer;
+    }
+}
+
+static void * data_pos(const void* data, size_t size_elem, int position){
+    return (void *)((size_t)data + size_elem * position);
 }
 
 /**
@@ -72,44 +80,87 @@ static void swap(char **line1, char **line2){
  * 
  * @return number of lines going earlier by func
  */
-static int partition(char **text, int start, int end, compare_str_func func){
-    char *base = text[end - 1];
+static int partition_lomuto(const void *text, size_t elem,  int start, int end, compare_str_func func){
+    void *base = data_pos(text, elem, end - 1);
     int new_base_pos = start;
 
     for (int text_line = start; text_line < end; text_line++){
-        if (func(text[text_line], base) < 0){
-            swap(&text[new_base_pos], &text[text_line]);
+        if (func(data_pos(text, elem, text_line), base) < 0){
+            swap(data_pos(text, elem, new_base_pos), data_pos(text, elem, text_line), elem);
             new_base_pos++;
         }
     }
-    swap(&text[end - 1], &text[new_base_pos]);
+    swap(base, data_pos(text, elem, new_base_pos), elem);
     return new_base_pos;
 }
 
-void my_qsort(char **text, int start, int end, compare_str_func func){
-    if (end - start <= 1 || start < 0) return;
+static int partition_hoar(const void *text, size_t elem,  int start, int end, compare_str_func func){
+    void *base = data_pos(text, elem, end - 1);
+    int start_position = start;
+    int end_position = end - 2;
 
-    int smaller_elems = partition(text, start, end, func);
-    my_qsort(text, start, smaller_elems, func);
-    my_qsort(text, smaller_elems + 1, end, func);
+    while (end_position >= start_position){
+        while (start_position < end && func(data_pos(text, elem, start_position), base) < 0){
+            start_position++;
+        }
+        while (end_position >  0 && func(data_pos(text, elem, end_position), base) > 0){
+            end_position--;
+        }
+
+        
+        if (start_position >=  end_position) break;
+
+        swap(data_pos(text, elem, start_position), data_pos(text, elem, end_position), elem);
+
+        start_position++;
+        end_position--;
+    }
+    swap(base, data_pos(text, elem, start_position), elem);
+    return start_position;
 }
 
-int sort_text(char **text, int num_lines, compare_str_func func){
+
+void my_qsort(const void *data, size_t elem, int start, int end, compare_str_func func){
+    if (end - start <= 1 || start < 0) return;
+
+    int smaller_elems = partition_hoar(data, elem,  start, end, func);
+    my_qsort(data, elem, start, smaller_elems, func);
+    my_qsort(data, elem, smaller_elems + 1, end, func);
+}
+
+int bubble_sort(void *text, size_t elem, int num_lines, compare_str_func func){
     bool cycle_status = true;
     while (cycle_status){
         cycle_status = false;
 
         for (int text_line = 0; text_line < num_lines - 1; text_line++){
-            if (func(text[text_line], text[text_line + 1]) > 0){
+            if (func(data_pos(text, elem, text_line), data_pos(text, elem, text_line + 1)) > 0){
                 cycle_status = true;
-                swap(&text[text_line], &text[text_line + 1]);
+                swap(data_pos(text, elem, text_line), data_pos(text, elem, text_line + 1), elem);
             }
         }
     }
     return 0;
 }
 
-int my_strcmp_without_case(const char *str1, const char *str2){
+int my_strcmp_for_sort(const void *param1, const void *param2){
+    const char *str1 = *(const char * const *)param1;
+    const char *str2 = *(const char * const *)param2;
+
+    size_t n = 0;
+    while (str1[n] != '\0' && str2[n] != '\0'){
+        if (str1[n] != str2[n]){
+            return str1[n] - str2[n];
+        }
+        n++;
+    }
+    return str1[n] - str2[n];
+}
+
+int my_strcmp_without_case(const void *param1, const void *param2){
+    const char *str1 = *(const char * const *)param1;
+    const char *str2 = *(const char * const *)param2;
+
     int str1_pos = skip_start_symbols(str1);
     int str2_pos = skip_start_symbols(str2);
 
@@ -123,7 +174,10 @@ int my_strcmp_without_case(const char *str1, const char *str2){
     return 0;
 }
 
-int my_strrcmp_without_case(const char *str1, const char *str2){
+int my_strrcmp_without_case(const void *param1, const void *param2){
+    const char *str1 = *(const char * const *)param1;
+    const char *str2 = *(const char * const *)param2;
+
     int str1_left_pos = skip_start_symbols(str1);
     int str2_left_pos = skip_start_symbols(str2);
      
@@ -188,7 +242,7 @@ int generate_random_text(char **text, int text_len, int gen_len){
 
 static int skip_start_symbols(const char *str){
     int str_pos = 0;
-    while (isalpha(str[str_pos]) == 0 && str[str_pos] == '\0'){
+    while (isalpha(str[str_pos]) == 0 || str[str_pos] == '\0'){
         str_pos++;
     }
 

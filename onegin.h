@@ -3,13 +3,14 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "my_string_functions.h"
 
 /**
  * @brief the function by which sorting occurs
  */
-typedef int (*compare_str_func)(const char *, const char*);
+typedef int (*compare_str_func)(const void *, const void *);
 
 /**
  * @brief sort text lines from start to end by the func
@@ -21,7 +22,7 @@ typedef int (*compare_str_func)(const char *, const char*);
  * 
  * @return  sorted text 
  */
-void my_qsort(char **text, int start, int end, compare_str_func func);
+void my_qsort(const void *data, size_t elem, int start, int end, compare_str_func func);
 
 /**
  * @brief sort text lines by the func
@@ -32,7 +33,7 @@ void my_qsort(char **text, int start, int end, compare_str_func func);
  * 
  * @return  sorted text 
  */
-int sort_text(char **text, int num_lines, compare_str_func func);
+int bubble_sort(void *text, size_t elem, int num_lines, compare_str_func func);
 
 /**
  * @brief compairs two strings skips initial non-alphabetic characters
@@ -43,7 +44,7 @@ int sort_text(char **text, int num_lines, compare_str_func func);
  * @return  0 if strings are equal or number less than 0 if str1 < str2 
  *          number greater than 0 if str1 > str2 
  */
-int my_strcmp_without_case(const char *str1, const char *str2);
+int my_strcmp_without_case(const void *str1, const void *str2);
 
 /**
  * @brief compairs two strings from the end skips initial and final non-alphabetic characters
@@ -54,7 +55,9 @@ int my_strcmp_without_case(const char *str1, const char *str2);
  * @return  0 if strings are equal or number less than 0 if str1 < str2 
  *          number greater than 0 if str1 > str2 
  */
-int my_strrcmp_without_case(const char *str1, const char *str2);
+int my_strrcmp_without_case(const void *param1, const void *param2);
+
+int my_strcmp_for_sort(const void *param1, const void *param2);
 
 /**
  * @brief print new_text_len lines from text
