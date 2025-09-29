@@ -60,9 +60,10 @@ static int generate_text(const char * file_name);
 static int print_file_text(data_text data);
 
 static int clean_text(data_text *data){
-    free(data->text_points);
-    free(data->text);
-    data->size = 0;
+    free(data->text.lines);
+    free(data->buffer.text);
+    data->buffer.size = 0;
+    data->text.lines_count = 0;
     return 0;
 }
 
@@ -79,7 +80,7 @@ int run_console(){
                 printf(CONSOLE_RED "There is no such command!\n" CONSOLE_RESET);
             } 
             continue;
-        }  
+        }
 
         scanf("%15s", command);
         int command_status = run_commands(command);
@@ -113,9 +114,14 @@ static int run_commands(char *command){
     assert(command != NULL);
 
     static data_text data = {
-        .size = 0,
-        .text = NULL,
-        .text_points = NULL
+        .buffer = {
+            .size = 0,
+            .text = NULL,
+        },
+        .text = {
+            .lines_count = 0,
+            .lines = NULL,
+        }
     };
 
     if (my_strcmp(command, "of") == 0){
@@ -162,15 +168,15 @@ static int open_file(data_text *data){
 
     scanf("%100s", file_name);
 
-    data->text = read_file(file_name, data);
-    if (data->text == NULL) return -1;
+    read_file(file_name, data);
+    if (data->buffer.text == NULL) return -1;
 
-    data->size = find_len_text_lines(*data);
+    data->text.lines_count = find_len_text_lines(*data);
 
-    if (data->size == 0) return -1;
+    if (data->text.lines_count == 0) return -1;
 
     split_text(data);
-    if (data->text_points == NULL) return -1;
+    if (data->text.lines == NULL) return -1;
     printf(CONSOLE_GREEN "COMPLITED\n" CONSOLE_RESET);
     return 0;
 }
@@ -182,38 +188,43 @@ static int sort_print_file(data_text *data, compareFunc func){
 
     clock_t start = clock();
 
-    my_qsort(data->text_points, sizeof(char *), 0, data->size, func);
+    my_qsort(data->text.lines, sizeof(char *), 0, data->text.lines_count, func);
 
     clock_t end = clock();
     double time_spent = (double)(end - start) * 1000 / CLOCKS_PER_SEC;
 
     printf("Time was spent sorting: " CONSOLE_YELLOW  "%0.3f s\n" CONSOLE_RESET, time_spent);
     
-    print_text(data->text_points, data->size);
+    print_text(data->text.lines, data->text.lines_count);
 
     return 0;
 }
 
 static int generate_text(const char * file_name){
-    data_text data = {
-        .size = 0,
-        .text = NULL,
-        .text_points = NULL
-    };;
+    static data_text data = {
+        .buffer = {
+            .size = 0,
+            .text = NULL,
+        },
+        .text = {
+            .lines_count = 0,
+            .lines = NULL,
+        }
+    };
 
-    data.text = read_file(file_name, &data);
-    if (data.text == NULL) return -1;
+    read_file(file_name, &data);
+    if (data.buffer.text == NULL) return -1;
 
-    int text_for_generate_len = find_len_text_lines(data);
-    if (text_for_generate_len == 0) return -1;
+    data.text.lines_count = find_len_text_lines(data);
+    if (data.text.lines_count == 0) return -1;
 
     split_text(&data);
 
-    if (data.text_points == NULL) return -1;
+    if (data.text.lines == NULL) return -1;
 
     clock_t start = clock();
 
-    my_qsort(data.text_points, sizeof(char *), 0, text_for_generate_len, my_strrcmp_without_case);
+    my_qsort(data.text.lines, sizeof(char *), 0, data.text.lines_count, my_strrcmp_without_case);
 
     clock_t end = clock();
     double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
@@ -225,7 +236,7 @@ static int generate_text(const char * file_name){
     printf(CONSOLE_BLUE "How many lines you want generate: " CONSOLE_RESET);
     scanf("%d", &generate_text_len);
 
-    generate_random_text(data.text_points, text_for_generate_len, generate_text_len);
+    generate_random_text(data.text.lines, data.text.lines_count, generate_text_len);
 
     clean_text(&data);
 
@@ -233,11 +244,11 @@ static int generate_text(const char * file_name){
 }
 
 static int print_file_text(data_text data){
-    printf("%4d: \"%s\"\n", 0, data.text);
+    printf("%4d: \"%s\"\n", 0, data.buffer.text);
 
-    for (int text_position = 1; text_position < data.size; data.text++){
-        if (data.text[0] == '\0'){
-            printf("%4d: \"%s\"\n", text_position, data.text + 1);
+    for (int text_position = 1; text_position < data.text.lines_count; data.buffer.text++){
+        if (data.buffer.text[0] == '\0'){
+            printf("%4d: \"%s\"\n", text_position, data.buffer.text + 1);
             text_position++;
         }
     }

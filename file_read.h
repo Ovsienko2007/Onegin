@@ -7,10 +7,19 @@
 
 #include "my_string_functions.h"
 
-struct data_text{
+struct text_buffer{
     int size;
-    char * text;
-    char **text_points;
+    char *text;
+};
+
+struct lines_data{
+    int lines_count;
+    char **lines;
+};
+
+struct data_text{
+    text_buffer buffer;
+    lines_data text;
 };
 
 /**
@@ -21,7 +30,7 @@ struct data_text{
  * 
  * @return string with lines from file, NULL in case of error
  */
-char * read_file(const char * file_name, data_text *data);
+int read_file(const char * file_name, data_text *data);
 
 /**
  * @brief finds the size of the given file in bytes

@@ -1,14 +1,14 @@
 #include "file_read.h"
 
 int split_text(data_text *data){
-    assert(data->text != NULL);
+    assert(data->buffer.text != NULL);
 
-    char *text = data->text;
-    data->text_points = (char **)calloc(data->size, sizeof(char *));
-    if (data->text_points == NULL) return NULL;
+    char *text = data->buffer.text;
+    data->text.lines = (char **)calloc(data->text.lines_count, sizeof(char *));
+    if (data->text.lines == NULL) return NULL;
 
-    for (int text_position = 0; text_position < data->size; text_position++){
-        data->text_points[text_position] = text;
+    for (int text_position = 0; text_position < data->text.lines_count; text_position++){
+        data->text.lines[text_position] = text;
 
         text = my_strchr(text, '\n');
         if  (text == NULL) break;
@@ -21,26 +21,26 @@ int split_text(data_text *data){
 }
 
 int find_len_text_lines(data_text data){
-    assert(data.text != NULL);
+    assert(data.buffer.text != NULL);
 
     int line_count = 0;
     while (true){
-        data.text = my_strchr(data.text, '\n');
-        if (data.text == NULL) break;
-        data.text++;
+        data.buffer.text = my_strchr(data.buffer.text, '\n');
+        if (data.buffer.text == NULL) break;
+        data.buffer.text++;
         line_count++;
     }
     return line_count + 1;
 } 
 
-char * read_file(const char * file_name, data_text *data){
+int read_file(const char * file_name, data_text *data){
     assert(file_name != NULL);
     assert(data != NULL);
 
     size_t file_len = find_file_size(file_name) / sizeof(char) + 1;
 
-    char * file_text = (char *)calloc(file_len, sizeof(char));
-    if (file_text == NULL)  return NULL;
+    data->buffer.text = (char *)calloc(file_len, sizeof(char));
+    if (data->buffer.text == NULL)  return NULL;
 
     int file_descriptor = open(file_name, O_RDONLY);
     
@@ -49,15 +49,14 @@ char * read_file(const char * file_name, data_text *data){
         return NULL;
     }
 
-    data->size = read(file_descriptor, file_text, find_file_size(file_name));
+    data->buffer.size = read(file_descriptor, data->buffer.text, find_file_size(file_name));
 
     close(file_descriptor);
 
-    if (data->size == -1) return NULL;
+    if (data->buffer.size == -1) return NULL;
 
-    file_text[data->size] = '\0';
-
-    return file_text;
+    data->buffer.text[data->buffer.size] = '\0';
+    return 0;
 } 
 
 off_t find_file_size(const char * file_name){
